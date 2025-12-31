@@ -6,7 +6,9 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "cryptography>=46.0.0",
+    # Only used for debugging in a jupyter notebook
     "treescope>=0.1.10",
+    "ipykernel",
 ]
 
 [tool.ruff]
