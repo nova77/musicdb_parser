@@ -95,8 +95,7 @@ def _itlp_parse_msdh(reader: utils.BufferReader) -> parsing_types.Msdh | None:
   """Parse msdh (section boundary) block."""
   # Reading header
   header, header_len, data_len, block_type = reader.read('<4sIII')
-  if header != b'msdh':
-    raise ValueError(f'Invalid "msdh" block header {header}')
+  utils.check_signature(header, b'msdh')
 
   # Skipping header section
   reader.advance(header_len)
@@ -145,8 +144,7 @@ def _itlp_parse_msdh(reader: utils.BufferReader) -> parsing_types.Msdh | None:
 def _parse_outer_envelope(reader: utils.BufferReader) -> str | None:
   """Parse mfdh block (application version)."""
   header, header_len = reader.read('<4sI')
-  if header != b'mfdh':
-    raise ValueError(f'Invalid "mfdh" block header {header}')
+  utils.check_signature(header, b'mfdh')
 
   version_str_len = reader.read_uint8(16)
   application_version = reader.read_bytes(17, version_str_len)
@@ -160,8 +158,7 @@ def _itlp_parse_mhoh(
   """Parse mhoh block (metadata)"""
 
   header, _, section_len, mhoh_subtype = reader.read('<4sIII')
-  if header != b'mhoh':
-    raise ValueError(f'Invalid "mhoh" block header {header}')
+  utils.check_signature(header, b'mhoh')
 
   container = None
   if mhoh_subtype in parsing_types.MhohFlexType:
@@ -217,8 +214,7 @@ def _parse_library_info(
 
   # Reading header informations
   header, header_len, num_mhoh = reader.read('<4sII')
-  if header != b'mhgh':
-    raise ValueError(f'Invalid "mhgh" block header {header}.')
+  utils.check_signature(header, b'mhgh')
 
   list_size = reader.read_uint8(55)
   reader.advance(header_len)
@@ -237,8 +233,7 @@ def _parse_library_info(
 def _parse_library_location(reader: utils.BufferReader) -> str | None:
   """Parse file block (absolute path of the library)."""
   header, header_len, total_len = reader.read('<4sII')
-  if header != b'msdh':
-    raise ValueError(f'Invalid "msdh" block header {header}.')
+  utils.check_signature(header, b'msdh')
 
   # Parsing header informations
   string_len = total_len - header_len
@@ -261,8 +256,7 @@ def _itlp_parse_track(
   """Parse mlth block (master track list)."""
 
   header, header_len, num_mith = reader.read('<4sII')
-  if header != b'mlth':
-    raise ValueError(f'Invalid "mlth" block header {header}.')
+  utils.check_signature(header, b'mlth')
 
   reader.advance(header_len)
   # Parsing mith blocks
@@ -278,8 +272,7 @@ def _itlp_parse_mith(
   """Parse mith block (track item)."""
 
   header, header_len, data_len, num_mhohs, track_id = reader.read('<4sIIII')
-  if header != b'mith':
-    raise ValueError(f'Invalid "mith" block header {header}.')
+  utils.check_signature(header, b'mith')
   expected_end_pos = reader.pos + data_len
 
   # Reading mith metadata
@@ -334,8 +327,7 @@ def _itlp_parse_playlist(
 ) -> list[parsing_types.MiphPlaylist] | None:
   """Parse mlph block (playlist list)."""
   header, header_len, num_miph = reader.read('<4sII')
-  if header != b'mlph':
-    raise ValueError(f'Invalid "mlph" block header {header}.')
+  utils.check_signature(header, b'mlph')
   reader.advance(header_len)
 
   # Parsing miph blocks
@@ -352,8 +344,7 @@ def _itlp_parse_miph(
   """Parse miph block (playlist)"""
 
   header, header_len, data_len, num_mhoh, num_mtph = reader.read('<4sIIII')
-  if header != b'miph':
-    raise ValueError(f'Invalid "miph" block header {header}.')
+  utils.check_signature(header, b'miph')
   expected_end_pos = reader.pos + data_len
 
   persistent_id = reader.read_uint64(440)
@@ -406,8 +397,7 @@ def _itlp_parse_miph(
 def _itlp_parse_mtph(reader: utils.BufferReader) -> int:
   """Parse mtph block (playlist item)"""
   header, header_len = reader.read('<4sI')
-  if header != b'mtph':
-    raise ValueError(f'Invalid "mtph" block header {header}.')
+  utils.check_signature(header, b'mtph')
 
   identifier = reader.read_uint32(24)
   reader.advance(header_len)
@@ -424,8 +414,7 @@ def _parse_album_collection(
   """Parse mlah block (album/collection)."""
 
   header, header_len, num_miah = reader.read('<4sII')
-  if header != b'mlah':
-    raise ValueError(f'Invalid "mlah" block header {header}.')
+  utils.check_signature(header, b'mlah')
   reader.advance(header_len)
 
   miahs = []
@@ -464,8 +453,7 @@ def _itlp_parse_artist(
   """Parse mlih block (artist master)."""
 
   header, header_len, num_miih = reader.read('<4sII')
-  if header != b'mlih':
-    raise ValueError(f'Invalid "mlih" block header {header}.')
+  utils.check_signature(header, b'mlih')
   reader.advance(header_len)
 
   # Parsing miih blocks
@@ -481,9 +469,7 @@ def _itlp_parse_miih(
   """Parse miih block (artist item)."""
 
   header, header_len, _, num_mhoh = reader.read('<4sIII')
-  if header != b'miih':
-    raise ValueError(f'Invalid "miih" block header {header}.')
-
+  utils.check_signature(header, b'miih')
   reader.advance(header_len)
 
   # Parsing mhoh blocks
