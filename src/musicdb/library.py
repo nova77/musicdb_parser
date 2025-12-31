@@ -5,6 +5,7 @@ structures.
 
 import datetime
 import dataclasses
+import urllib.parse
 
 from src import utils
 from src.musicdb import parsing_types
@@ -33,6 +34,10 @@ class Track:
 
   metadata: dict[str, str] = dataclasses.field(default_factory=dict)
 
+  @property
+  def short_rating(self) -> int:
+    """Rating from 0 to 5."""
+    return int(self.rating/100 * 5)
 
 @dataclasses.dataclass(slots=True)
 class Playlist:
@@ -81,7 +86,6 @@ def get_playlists(raw_library: parsing_types.RawLibrary) -> list[Playlist]:
 
   assert isinstance(section.sub_section, list)
   assert len(section.sub_section) > 0
-  assert isinstance(section.sub_section[0], parsing_types.LpmaPlaylist)
 
   tz_offset = raw_library.tz_offset
   playlists = []
@@ -94,6 +98,31 @@ def get_playlists(raw_library: parsing_types.RawLibrary) -> list[Playlist]:
       playlists.append(playlist)
 
   return playlists
+
+
+def get_library_location(raw_library: parsing_types.RawLibrary,
+                         include_file_prefix: bool = False) -> str:
+  for section in raw_library.sections:
+    if section.section_type == parsing_types.SectionType.PLMA_LIBRARY_MASTER:
+      break
+  else:
+    raise ValueError('Library section not found')
+
+  assert isinstance(section.sub_section, list)
+  assert len(section.sub_section) > 0
+
+  for boma_data in section.sub_section:
+    if not isinstance(boma_data, parsing_types.BomaDataContainer):
+      raise ValueError('Invalid subsection boma type:', type(boma_data))
+
+    if boma_data.type == parsing_types.BomaWideCharType.MANAGED_MEDIA_FOLDER:
+      assert isinstance(boma_data.value, str)
+      path = urllib.parse.unquote(boma_data.value)
+      if not include_file_prefix:
+        path = path.removeprefix('file://localhost/')
+      return path
+
+  raise ValueError('Could not find any media folder boma entry.')
 
 
 ##############################################################################
