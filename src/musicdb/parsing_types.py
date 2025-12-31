@@ -24,6 +24,7 @@ class SectionSignature(Enum):
   LPMA_PLAYLIST_MASTER = b'lPma'
   LMPA_PLAYLIST_ITEM = b'lpma'
   IPFA_BOMA = b'ipfa'
+  SLST_SMART_PLAYLIST_BOMA = b'SLst'
 
   # General data container
   BOMA_CONTAINER = b'boma'
@@ -120,8 +121,12 @@ class BomaTrackNumericsType(IntEnum):
 
 
 class BomaOtherType(IntEnum):
-  IPFA_PLAYLIST = 0xCE
   VIDEO = 0x24
+
+class BomaPlaylistType(IntEnum):
+  IPFA_PLAYLIST = 0xCE
+  SLST_SMART_PLAYLIST = 0xc9
+  # UNK_PLAYLIST_2 = 0xca
 
 
 # I know those point to something but I cannot figure what exactly.
@@ -129,9 +134,6 @@ class BomaOtherType(IntEnum):
 #   UNK_ALB_1 = 0x133
 # class BomaArtistType(IntEnum):
 #   UNK_ART_2 = 0x193
-# class BomaPlaylistType(IntEnum):
-#   UNK_PLAYLIST_1 = 0xc9
-#   UNK_PLAYLIST_2 = 0xca
 
 
 @dataclass(slots=True)
@@ -194,6 +196,8 @@ class LpmaPlaylist:
   date_created: int
   date_modified: int
   num_tracks: int
+  is_smart: bool = False
+  is_folder: bool = False
 
   persistent_track_ids: list[int] = field(default_factory=list, repr=False)
   bomas: list[BomaDataContainer] = field(default_factory=list)

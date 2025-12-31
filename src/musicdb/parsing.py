@@ -157,7 +157,7 @@ def _parse_boma(
     container = parsing_types.BomaDataContainer(
       type=parsing_types.BomaBookType(boma_subtype), value=None
     )
-  elif boma_subtype == parsing_types.BomaOtherType.IPFA_PLAYLIST:
+  elif boma_subtype in parsing_types.BomaPlaylistType:
     _parse_boma_ipfa_playlist(reader, **kwargs)
   elif boma_subtype == parsing_types.BomaOtherType.VIDEO:
     vertical, horizontal = reader.read('<II', offset=20)
@@ -295,14 +295,11 @@ def _parse_lpma_playlists(
   for _ in range(num_lpma):
     if lpma := _parse_lpma_item(reader):
       lpmas.append(lpma)
-
   return lpmas
 
 
 def _parse_lpma_item(reader: utils.BufferReader) -> parsing_types.LpmaPlaylist:
-  header, section_len, sections_len, num_boma, num_tracks = reader.read(
-    '<4sIIII'
-  )
+  header, section_len, _, num_boma, num_tracks = reader.read('<4sIIII')
   utils.check_signature(
     header, parsing_types.SectionSignature.LMPA_PLAYLIST_ITEM.value
   )
@@ -312,6 +309,7 @@ def _parse_lpma_item(reader: utils.BufferReader) -> parsing_types.LpmaPlaylist:
     date_created=reader.read_uint32(22),
     date_modified=reader.read_uint32(138),
     num_tracks=num_tracks,
+    is_folder=bool(reader.read_uint8(49)),
   )
   reader.advance(section_len)
 
@@ -325,9 +323,16 @@ def _parse_boma_ipfa_playlist(
   reader: utils.BufferReader,
   lpma_playlist: parsing_types.LpmaPlaylist,
 ) -> None:
-  header, section_len = reader.read('<4sI', 20)
-  utils.check_signature(header, parsing_types.SectionSignature.IPFA_BOMA.value)
-  lpma_playlist.persistent_track_ids.append(reader.read_uint64(40))
+  header = reader.read_bytes(offset=20, length=4)
+  match header:
+    case parsing_types.SectionSignature.IPFA_BOMA.value:
+      lpma_playlist.persistent_track_ids.append(reader.read_uint64(40))
+    case parsing_types.SectionSignature.SLST_SMART_PLAYLIST_BOMA.value:
+      # There's much more here about being a smart playlist, but for now
+      # we just include this.
+      lpma_playlist.is_smart = True
+    case _:
+      raise ValueError(f'Invalid boma playlist signature {header}')
 
 
 ##############################################################################
