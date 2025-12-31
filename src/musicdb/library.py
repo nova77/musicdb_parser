@@ -39,6 +39,8 @@ class Playlist:
   name: str
   date_created: datetime.datetime | None = None
   date_modified: datetime.datetime | None = None
+  is_smart: bool = False
+  is_folder: bool = False
   persistent_track_ids: list[int] = dataclasses.field(
     default_factory=list, repr=False
   )
@@ -142,5 +144,7 @@ def _lpma2playlist(
     name=name,
     date_created=utils.get_datetime(lpma_playlist.date_created, tz_offset),
     date_modified=utils.get_datetime(lpma_playlist.date_modified, tz_offset),
+    is_smart=lpma_playlist.is_smart,
+    is_folder=lpma_playlist.is_folder,
     persistent_track_ids=lpma_playlist.persistent_track_ids,
   )
