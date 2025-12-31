@@ -226,8 +226,7 @@ def _parse_library_info(
   # Parsing mhoh blocks
   mhohs = []
   for _ in range(num_mhoh):
-    mhoh_entry = _itlp_parse_mhoh(reader)
-    if mhoh_entry is not None:
+    if mhoh_entry := _itlp_parse_mhoh(reader):
       mhohs.append(mhoh_entry)
 
   return parsing_types.MhghLibrarySettings(
@@ -304,8 +303,7 @@ def _itlp_parse_mith(
   # Parsing embedded mhoh in mith
   mhohs = []
   for _ in range(num_mhohs):
-    mhoh_entry = _itlp_parse_mhoh(reader)
-    if mhoh_entry is not None:
+    if mhoh_entry := _itlp_parse_mhoh(reader):
       mhohs.append(mhoh_entry)
 
   if reader.pos != expected_end_pos:
@@ -343,9 +341,7 @@ def _itlp_parse_playlist(
   # Parsing miph blocks
   miphs = []
   for _ in range(num_miph):
-    # header, header_len = reader.read('<4sI')
-    miph_entry = _itlp_parse_miph(reader)
-    if miph_entry is not None:
+    if miph_entry := _itlp_parse_miph(reader):
       miphs.append(miph_entry)
   return miphs
 
@@ -368,8 +364,7 @@ def _itlp_parse_miph(
   # Parsing mhoh blocks
   mhohs = []
   for _ in range(num_mhoh):
-    mhoh_entry = _itlp_parse_mhoh(reader)
-    if mhoh_entry is not None:
+    if mhoh_entry := _itlp_parse_mhoh(reader):
       mhohs.append(mhoh_entry)
 
   # Parsing mtph blocks
@@ -431,16 +426,12 @@ def _parse_album_collection(
   header, header_len, num_miah = reader.read('<4sII')
   if header != b'mlah':
     raise ValueError(f'Invalid "mlah" block header {header}.')
-
   reader.advance(header_len)
 
-  # Parsing miah blocks
   miahs = []
   for _ in range(num_miah):
-    miah = _itlp_parse_miah(reader)
-    if miah is None:
-      return None
-    miahs.append(miah)
+    if miah_entries := _itlp_parse_miah(reader):
+      miahs.append(miah_entries)
   return miahs
 
 
@@ -457,8 +448,7 @@ def _itlp_parse_miah(
   # Parsing mhoh blocks
   mhohs = []
   for _ in range(num_mhoh):
-    mhoh_entry = _itlp_parse_mhoh(reader)
-    if mhoh_entry is not None:
+    if mhoh_entry := _itlp_parse_mhoh(reader):
       mhohs.append(mhoh_entry)
 
   return mhohs
@@ -499,7 +489,6 @@ def _itlp_parse_miih(
   # Parsing mhoh blocks
   mhohs = []
   for _ in range(num_mhoh):
-    mhoh_entry = _itlp_parse_mhoh(reader)
-    if mhoh_entry is not None:
+    if mhoh_entry := _itlp_parse_mhoh(reader):
       mhohs.append(mhoh_entry)
   return mhohs
