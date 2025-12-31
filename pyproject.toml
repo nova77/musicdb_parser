@@ -1,0 +1,18 @@
+[project]
+name = "musicdb_parser"
+version = "0.0.1"
+description = "A simple parser for both itl and musicdb formats."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "cryptography>=46.0.0",
+    "treescope>=0.1.10",
+]
+
+[tool.ruff]
+indent-width = 2
+target-version = "py313"
+line-length = 79
+
+[tool.ruff.format]
+quote-style = "single"
