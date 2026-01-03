@@ -3,4 +3,3 @@ __pycache__/
 uv.lock
 notebooks/*
 *.egg-info
-navidrome/*

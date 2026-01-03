@@ -1,6 +1,9 @@
 """
 Updates a navidrome database with play count, (last) play date, rating, and
-loves. Note: very experimental!
+loves.
+
+Note: it relies on the file path to match each track. If you have a completely
+different file structure between the two it won't work.
 
 Example run:
 
