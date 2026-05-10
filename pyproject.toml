@@ -5,6 +5,7 @@ description = "A simple parser for both itl and musicdb formats."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "absl-py>=2.1.0",
     "cryptography>=46.0.0",
     # Only used for debugging in a jupyter notebook
     "treescope>=0.1.10",
