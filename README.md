@@ -22,3 +22,10 @@ republished.
 
 The good news is that it's the same one for both dbs and it's pretty easy to
 find online. Just ask your favourite LLM for it.
+
+## Navidrome annotations & playlists export
+
+A utility script is included to export track annotations (play count, rating,
+etc) and playlists from an Apple Music library into a navidrome SQLite database.
+See also [navidrome/README.md](navidrome/README.md) for details on how it works
+and how to use it.
